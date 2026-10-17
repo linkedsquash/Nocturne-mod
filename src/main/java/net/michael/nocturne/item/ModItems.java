@@ -2,6 +2,7 @@ package net.michael.nocturne.item;
 
 import net.michael.nocturne.Nocturne;
 import net.michael.nocturne.item.custom.WhipItem;
+import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;

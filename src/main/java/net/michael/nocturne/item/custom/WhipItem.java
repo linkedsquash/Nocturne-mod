@@ -9,7 +9,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-private WhipItem.WhipEntityState currentState = WhipItem.WhipEntityState.ACTIVE;
 
 public class WhipItem extends Item implements Vanishable {
     public WhipItem(final Properties properties)
@@ -19,12 +18,13 @@ public class WhipItem extends Item implements Vanishable {
     @Override
     public InteractionResultHolder<ItemStack> use( Level level,  Player player, InteractionHand interactionHand){
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (WhipEntityState.ACTIVE != null) {
-            if (!level.isClientSide) {
-                int i = WhipEntityState.ACTIVE.retrieve(itemStack);
-                itemStack.hurtAndBreak(i, player, playerx -> playerx.broadcastBreakEvent(interactionHand));
-            }
-            level.playSound(
+            WhipEntity tip = WhipEntity.findActive((player));
+            if (tip != null){
+                if(!level.isClientSide){
+                    int i = tip.retrieve();
+                    itemStack.hurtAndBreak(i, player, playerx -> playerx.broadcastBreakEvent(interactionHand));
+                }
+                level.playSound(
                     null,
                     player.getX(),
                     player.getY(),
@@ -55,13 +55,8 @@ public class WhipItem extends Item implements Vanishable {
         return  InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide());
 
     }
-
-    static enum WhipEntityState{
-        ACTIVE,
-        HIT,
-        HOOKED
-    }
-
 }
+
+
 
 

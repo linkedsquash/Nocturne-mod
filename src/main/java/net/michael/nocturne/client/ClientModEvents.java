@@ -12,6 +12,6 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientModEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.WHIP_TIP.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.WHIP_TIPS.get(), NoopRenderer::new);
     }
 }
