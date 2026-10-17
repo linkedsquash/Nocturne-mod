@@ -1,5 +1,6 @@
 package net.michael.nocturne.item.custom;
 
+import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -48,7 +49,7 @@ public class WhipItem extends Item implements Vanishable {
                     0.4F /(level.getRandom().nextFloat() * 0.4F + 0.8F)
             );
             if (!level.isClientSide){
-                level.addFreshEntity(new FishingHook(Player player,Level level ));
+                level.addFreshEntity(new WhipEntity(Player player,Level level ));
             }
 
         }

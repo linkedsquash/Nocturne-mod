@@ -1,5 +1,6 @@
 package net.michael.nocturne.world.entity.projectile;
 
+import net.michael.nocturne.world.entity.ModEntities;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -18,7 +19,7 @@ public class WhipEntity extends Projectile {
     }
 
     public WhipEntity(Player player, Level level){
-        this(ENTITY_TYPE.WHIP_TIP, level);
+        this(ModEntities.WHIP_TIP, level);
         this.setOwner(player);
         double d = player.getX();
         double e = player.getEyeY();
