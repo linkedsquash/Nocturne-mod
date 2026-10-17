@@ -4,14 +4,12 @@ import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
+private WhipItem.WhipEntityState currentState = WhipItem.WhipEntityState.ACTIVE;
 
 public class WhipItem extends Item implements Vanishable {
     public WhipItem(final Properties properties)
@@ -21,9 +19,9 @@ public class WhipItem extends Item implements Vanishable {
     @Override
     public InteractionResultHolder<ItemStack> use( Level level,  Player player, InteractionHand interactionHand){
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (player.tip_out != null) {
+        if (WhipEntityState.ACTIVE != null) {
             if (!level.isClientSide) {
-                int i = player.tip_out.retrieve(itemStack);
+                int i = WhipEntityState.ACTIVE.retrieve(itemStack);
                 itemStack.hurtAndBreak(i, player, playerx -> playerx.broadcastBreakEvent(interactionHand));
             }
             level.playSound(
@@ -49,12 +47,19 @@ public class WhipItem extends Item implements Vanishable {
                     0.4F /(level.getRandom().nextFloat() * 0.4F + 0.8F)
             );
             if (!level.isClientSide){
-                level.addFreshEntity(new WhipEntity(Player player,Level level ));
+                level.addFreshEntity(new WhipEntity(player ,level ));
             }
 
         }
 
         return  InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide());
+
+    }
+
+    static enum WhipEntityState{
+        ACTIVE,
+        HIT,
+        HOOKED
     }
 
 }
