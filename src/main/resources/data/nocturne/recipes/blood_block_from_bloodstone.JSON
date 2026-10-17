@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "nocturne:bloodstone"
+    }
+  },
+    "result": {
+      "item": "nocturne:blood_block"
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "nocturne:blood_block"
+    }
+  ],
+  "result": {
+    "item": "nocturne:bloodstone",
+    "count": 9
+  }
+}

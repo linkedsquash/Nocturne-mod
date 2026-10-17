@@ -1,13 +1,12 @@
 package net.michael.nocturne;
 
 import com.mojang.logging.LogUtils;
-import net.michael.nocturne.item.ModCreativeModeTabs;
+import net.michael.nocturne.block.ModBlocks;
 import net.michael.nocturne.item.ModItems;
-import net.minecraft.world.item.CreativeModeTabs;
+import net.michael.nocturne.world.entity.ModEntities;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -23,8 +22,9 @@ public class Nocturne {
     public Nocturne(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
 
+        ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
-
+        ModBlocks.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
 
         // Register the commonSetup method for modloading
