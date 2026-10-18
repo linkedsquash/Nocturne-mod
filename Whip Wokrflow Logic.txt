@@ -1,0 +1,6 @@
+
+	1. player uses the whip with no active WhipEntity
+ -> 2. it lauches near their hand in the direction they're looking
+ -> 3. Give it a fixed speed and maximun distance, it stops if it hits a block or entity
+ -> 4. after the stop it stays at that position until the player retracts it
+ -> 5. what removes the entity automatically, player dies, moves too far , ect
