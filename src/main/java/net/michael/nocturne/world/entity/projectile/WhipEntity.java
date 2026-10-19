@@ -43,8 +43,8 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         return player.getEyePosition().subtract(this.position());
     }
 
-    public boolean extendWhip() {
-        return true;
+    public void extendWhip() {
+
     }
 
     // Returns true if the tip was given return movement; false if it was removed
