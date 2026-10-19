@@ -163,9 +163,11 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         Player player = this.getPlayerOwner(); // Get the player this tip belongs to.
 
         Vec3 playerEyePosition = player.getEyePosition();
-        Vec3 velocity = setDeltaMovement();
+
+        this.move(MoverType.SELF, this.getDeltaMovement());   // Apply movement
 
         double distanceTravelled = this.position().distanceTo(spawnPosition);
+
         if (player == null) {
             this.discard();
             return;
