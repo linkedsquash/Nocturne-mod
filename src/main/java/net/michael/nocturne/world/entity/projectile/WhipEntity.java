@@ -71,7 +71,7 @@ public class WhipEntity extends Projectile {// the class declarations that tells
             return false;
         }
 
-        this.setDeltaMovement(toPlayerDirection.normalize().scale(1.5).normalize());
+        this.setDeltaMovement(toPlayerDirection.normalize().scale(1.5));
         return true;
     }
 
@@ -163,17 +163,16 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         Player player = this.getPlayerOwner(); // Get the player this tip belongs to.
 
         Vec3 playerEyePosition = player.getEyePosition();
+        Vec3 velocity = setDeltaMovement();
 
         double distanceTravelled = this.position().distanceTo(spawnPosition);
-
-
         if (player == null) {
             this.discard();
             return;
-
         }
-
         if (!this.level().isClientSide) {
+            this.move(MoverType.SELF, this.getDeltaMovement());   // Apply movement
+
             if (currentState == WhipEntityState.RETRACTING) {
                 retractWhip();
             }
