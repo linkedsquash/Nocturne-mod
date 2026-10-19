@@ -2,8 +2,6 @@ package net.michael.nocturne.world.entity.projectile;
 
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.ModEntities;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Position;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -121,7 +119,7 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         return 1; // supplies the durability damage amount to WhipItem.hurtAndBreak()
     }
 
-    public WhipEntity findActive(Player player) { // Finds the player's first active whip tip.
+    public static WhipEntity findActive(Player player) { // Finds the player's first active whip tip.
         // It's the method call that performs the search; the declaration creates the variable that holds the results.
         List<WhipEntity> tips = player.level().getEntitiesOfClass( //'List<WhipEntity> tips' declares a variable that can hold a list of WhipEntity references.
                 // The call to getEntitiesOfClass(...) asks Minecraft to find matching entities in the level.

@@ -1,84 +1,72 @@
 package net.michael.nocturne.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.michael.nocturne.Nocturne;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.michael.nocturne.block.ModBlocks;
-import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.projectile.WhipEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
-
-import static java.nio.file.Files.getOwner;
-
-public class WhipEntityRenderer extends EntityRenderer<WhipEntity>{
-
+public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
     private final BlockRenderDispatcher blockRenderer;
 
+    public WhipEntityRenderer(EntityRendererProvider.Context context) {
+        super(context);
 
-    public WhipEntityRenderer(EntityRendererProvider.Context context) { //class constructor that gets the entity data from WhipEntity
-        super(context); // hands the render to WhipEntity using super(...)
-        this.blockRenderer = context.getBlockRenderDispatcher(); // get the actual render
+        // Minecraft's block renderer is used below to draw the temporary tip marker.
+        this.blockRenderer = context.getBlockRenderDispatcher();
     }
-    //PoseStack lets you transform what you're about to draw without permanently changing the world coordinates of the entity.
-    //MultiBufferSource provides the rendering buffers Minecraft needs to draw the object.
-    //WhipEntity entity	The actual whip entity being drawn. You can read its position, rotation and other properties.
-    //float entityYaw	The entity's yaw rotation, in degrees.
-    //float partialTick	A value used to interpolate between game ticks, helping movement appear smooth.
-    @Override //overrides minecrafts render method
+
+    @Override
     public void render(
-            WhipEntity entity, //The actual whip entity being drawn
-            float entityYaw, //entity's Yaw value in degrees
-            float partialTick, // A value used to interpolate between game ticks, helping movement appear smooth.
-            PoseStack poseStack, //A stack of transformations used to position, rotate and scale the model while rendering.
-            MultiBufferSource buffer, //Provides the vertex buffers used to draw geometry and textures.
-            int packedLight // The lighting information used to render the entity at the appropriate brightness.
-
-    ){
+            WhipEntity entity,
+            float entityYaw,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource buffer,
+            int packedLight
+    ) {
         Player player = entity.getPlayerOwner();
-        if (player != null){
+
+        // The renderer's pose is already positioned at the whip entity.
+        // Draw the connecting line only if the owner still exists.
+        if (player != null) {
             poseStack.pushPose();
-            poseStack.scale(0.5F, 0.5F, 0.5F);
 
-            // Whip tip in world coordinates (replace this with your actual tip offset)
-            Vec3 tip = getTipPosition(entity);
+            // The whip tip is at the local origin because this renderer is
+            // positioned at the entity.
+            Vec3 tipLocal = Vec3.ZERO;
 
-            // Approximate player hand position in world coordinates
-            Vec3 hand = player.position();
+            // Convert the player's eye position from world coordinates into
+            // coordinates relative to the whip entity.
+            Vec3 playerEyeLocal = player.getEyePosition(partialTick)
+                    .subtract(entity.position());
 
-            // Convert both endpoints to coordinates relative to the whip
-            Vec3 start = tip.subtract(hand);
-            Vec3 end = hand.subtract(tip);
+            // Ask for a buffer that interprets each pair of vertices as a line.
+            VertexConsumer line = buffer.getBuffer(RenderType.lines());
 
+            // Submit the first endpoint: the whip tip.
+            addLineVertex(line, poseStack, tipLocal);
+
+            // Submit the second endpoint: the player's eye position.
+            // Together, these two vertices describe one line segment.
+            addLineVertex(line, poseStack, playerEyeLocal);
+
+            poseStack.popPose();
         }
-        int mainHand = player.getMainArm() == HumanoidArm.RIGHT ? 1 : -1;
-        ItemStack itemStack = player.getMainHandItem();
-        if (!itemStack.is(ModItems.WHIP.get())){
-            mainHand = -mainHand;
-        }
-        /*if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson())
-                && player == Minecraft.getInstance().player){}*/
 
-        //centers the block on the entity's position.
-        poseStack.translate(-0.5,-0.5,-0.5);
-        //Moves the block's rendering origin by half a block along each axis, centring
-        //the one-block-sized cube on the entity's position.
-        //Without this, the block would extend from the entity's position in the positive X, Y and Z directions.
+        // Draw the blood block centered on the whip entity as a temporary
+        // visual marker for the tip.
+        poseStack.pushPose();
+        poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-        //Draw a redstone block as a temporary visual marker.
-        //tells MC to use the blocks default model and texture
         blockRenderer.renderSingleBlock(
                 ModBlocks.BLOOD_BLOCK.get().defaultBlockState(),
                 poseStack,
@@ -88,29 +76,33 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity>{
         );
 
         poseStack.popPose();
-        //Restores the transformation state saved earlier,
-        // preventing translation from affecting subsequent rendering
 
-        super.render(
-                entity,
-                entityYaw,
-                partialTick,
-                poseStack,
-                buffer,
-                packedLight
-        );
+        // Let the base renderer perform any standard entity-renderer work.
+        super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
     }
-    private Vec3 getTipPosition(WhipEntity whipEntity) {
-        return whipEntity.position();
+
+    /**
+     * Adds one vertex to the line buffer.
+     *
+     * A vertex is one 3D point. A line needs two vertices, so this helper
+     * is called once for each endpoint.
+     */
+    private void addLineVertex(VertexConsumer line, PoseStack poseStack, Vec3 position) {
+        line.vertex(
+                        poseStack.last().pose(),
+                        (float) position.x,
+                        (float) position.y,
+                        (float) position.z
+                )
+                .color(120, 0, 0, 255) // dark red, fully opaque
+                .normal(0.0F, 1.0F, 0.0F) // placeholder normal for the line vertex
+                .endVertex(); // finish submitting this vertex
     }
 
     @Override
-    public  ResourceLocation getTextureLocation(WhipEntity entity){
-        return ResourceLocation.withDefaultNamespace(
-                "textures/block/blood_block.png"
-        );
+    public ResourceLocation getTextureLocation(WhipEntity entity) {
+        // The entity itself is drawn with the block renderer above,
+        // so this texture is not used for that marker.
+        return ResourceLocation.withDefaultNamespace("textures/block/blood_block.png");
     }
-
 }
-
-

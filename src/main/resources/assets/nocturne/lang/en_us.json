@@ -1,13 +1,10 @@
 {
-  //item names
   "item.nocturne.whip":"Whip",
 
   "item.nocturne.bloodstone":"Bloodstone",
 
-  //block names
   "block.nocturne.blood_block":"Bloodstone block",
   "block.nocturne.bloodstone_ore": "Bloodstone ore",
 
-  //creativetab name
   "creativetab.nocturne_tab":"Nocturne"
 }
