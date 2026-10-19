@@ -2,6 +2,8 @@ package net.michael.nocturne.world.entity.projectile;
 
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.ModEntities;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -72,8 +74,6 @@ public class WhipEntity extends Projectile {// the class declarations that tells
 
         this.setDeltaMovement(toPlayerDirection.normalize().scale(1.5));
     }
-
-
     // Saved at launch and used to measure how far the tip has travelled.
     // Change MAX_REACH below to adjust the maximum outbound distance.
     private Vec3 spawnPosition = Vec3.ZERO;
@@ -121,7 +121,7 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         return 1; // supplies the durability damage amount to WhipItem.hurtAndBreak()
     }
 
-    public static WhipEntity findActive(Player player) { // Finds the player's first active whip tip.
+    public WhipEntity findActive(Player player) { // Finds the player's first active whip tip.
         // It's the method call that performs the search; the declaration creates the variable that holds the results.
         List<WhipEntity> tips = player.level().getEntitiesOfClass( //'List<WhipEntity> tips' declares a variable that can hold a list of WhipEntity references.
                 // The call to getEntitiesOfClass(...) asks Minecraft to find matching entities in the level.

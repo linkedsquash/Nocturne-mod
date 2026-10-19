@@ -17,12 +17,16 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
 
 import static java.nio.file.Files.getOwner;
 
-public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
+public class WhipEntityRenderer extends EntityRenderer<WhipEntity>{
 
     private final BlockRenderDispatcher blockRenderer;
+
 
     public WhipEntityRenderer(EntityRendererProvider.Context context) { //class constructor that gets the entity data from WhipEntity
         super(context); // hands the render to WhipEntity using super(...)
@@ -48,14 +52,24 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
             poseStack.pushPose();
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
+            // Whip tip in world coordinates (replace this with your actual tip offset)
+            Vec3 tip = getTipPosition(entity);
+
+            // Approximate player hand position in world coordinates
+            Vec3 hand = player.position();
+
+            // Convert both endpoints to coordinates relative to the whip
+            Vec3 start = tip.subtract(hand);
+            Vec3 end = hand.subtract(tip);
+
         }
         int mainHand = player.getMainArm() == HumanoidArm.RIGHT ? 1 : -1;
         ItemStack itemStack = player.getMainHandItem();
         if (!itemStack.is(ModItems.WHIP.get())){
             mainHand = -mainHand;
         }
-        if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson())
-                && player == Minecraft.getInstance().player){}
+        /*if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson())
+                && player == Minecraft.getInstance().player){}*/
 
         //centers the block on the entity's position.
         poseStack.translate(-0.5,-0.5,-0.5);
@@ -86,6 +100,9 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
                 packedLight
         );
     }
+    private Vec3 getTipPosition(WhipEntity whipEntity) {
+        return whipEntity.position();
+    }
 
     @Override
     public  ResourceLocation getTextureLocation(WhipEntity entity){
@@ -93,6 +110,7 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
                 "textures/block/blood_block.png"
         );
     }
+
 }
 
 
