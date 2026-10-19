@@ -49,18 +49,17 @@ public class WhipEntity extends Projectile {// the class declarations that tells
 
     // Returns true if the tip was given return movement; false if it was removed
     // or is not currently retracting.
-    public boolean retractWhip() {
+    public void retractWhip() {
 
         Player player = getPlayerOwner();
 
         if (player == null) {
             this.discard();
-            return false;
+            return;
         }
 
-
         if (!checkRETRACTING()) {
-            return false;
+            return;
         }
 
         Vec3 toPlayerDirection = getRetractionDirection();
@@ -68,11 +67,10 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         // Already close enough to the target; don't normalize a tiny vector.
         if (toPlayerDirection.lengthSqr() < 1.0) {
             this.discard();
-            return false;
+            return;
         }
 
         this.setDeltaMovement(toPlayerDirection.normalize().scale(1.5));
-        return true;
     }
 
 
@@ -161,40 +159,38 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         super.tick();
 
         Player player = this.getPlayerOwner(); // Get the player this tip belongs to.
-
-        Vec3 playerEyePosition = player.getEyePosition();
-
-        this.move(MoverType.SELF, this.getDeltaMovement());   // Apply movement
-
         double distanceTravelled = this.position().distanceTo(spawnPosition);
+
 
         if (player == null) {
             this.discard();
             return;
         }
-        if (!this.level().isClientSide) {
-            this.move(MoverType.SELF, this.getDeltaMovement());   // Apply movement
+        this.move(MoverType.SELF, this.getDeltaMovement());   // Apply movement
 
-            if (currentState == WhipEntityState.RETRACTING) {
-                retractWhip();
-            }
+
+        if (!this.level().isClientSide) {
+            Vec3 playerEyePosition = player.getEyePosition();
+
             if (currentState == WhipEntityState.EXTENDING && (distanceTravelled >= MAX_REACH
-                    || this.distanceToSqr(playerEyePosition) >= MAX_REACH * MAX_REACH)) {
+                    || this.distanceToSqr(playerEyePosition) >= MAX_REACH * MAX_REACH))
+            {
                 setCurrentState(WhipEntityState.RETRACTING);
             }
             // This handles owner death/removal or switching away from
             // the whip. It deliberately does not enforce travel range.
             if (!this.mustRetractWhip(player)) {
-                if (currentState == WhipEntityState.RETRACTING) {
+                if (currentState == WhipEntityState.RETRACTING)
+                {
                     // Stop once close enough to the player's Eye. Adjust
                     // 1 to change the catch radius (it is squared distance).
-                    if (this.distanceToSqr(playerEyePosition) < 1) {
+                    if (this.distanceToSqr(playerEyePosition) < 1)
+                    {
                         this.discard();
-
-                    } else {
-                        // Recalculate direction every tick so the tip
-                        // follows the player if they move while it returns.
-                        this.retractWhip();
+                    }
+                    else
+                    {
+                        retractWhip();
                     }
                 }
             }
@@ -217,7 +213,7 @@ public class WhipEntity extends Projectile {// the class declarations that tells
     @Nullable
     // Return the owner only when it is a player.
     public Player getPlayerOwner() {
-        Entity entity = this.getOwner();
+        Entity entity = getOwner();
         return entity instanceof Player ? (Player) entity : null;
     }
 
