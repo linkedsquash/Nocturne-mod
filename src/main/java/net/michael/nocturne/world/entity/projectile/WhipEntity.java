@@ -125,8 +125,11 @@ public class WhipEntity extends Projectile {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        // Save the projectile's normal data first, such as its position and owner.
         super.addAdditionalSaveData(tag);
+        // Save the movement state by name, for example "EXTENDING" or "RETRACTING".
         tag.putString(TAG_STATE, getCurrentState().name());
+        // Save the launch position so the whip can still measure its travel distance after loading.
         tag.putDouble(TAG_SPAWN_X, spawnPosition.x);
         tag.putDouble(TAG_SPAWN_Y, spawnPosition.y);
         tag.putDouble(TAG_SPAWN_Z, spawnPosition.z);
@@ -134,17 +137,24 @@ public class WhipEntity extends Projectile {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+        // Let the parent projectile restore its own saved data first.
         super.readAdditionalSaveData(tag);
+        // Only try to restore the movement state if the save contains it.
         if (tag.contains(TAG_STATE)) {
             try {
+                // Convert the saved state name back into a WhipEntityState value.
                 setCurrentState(WhipEntityState.valueOf(tag.getString(TAG_STATE)));
             } catch (IllegalArgumentException ignored) {
+                // If the saved name is unknown, start in the safe default state instead of failing to load.
                 setCurrentState(WhipEntityState.EXTENDING);
             }
         }
+        // Restore the launch position only when all three coordinates are present in the save.
         if (tag.contains(TAG_SPAWN_X) && tag.contains(TAG_SPAWN_Y) && tag.contains(TAG_SPAWN_Z)) {
+            // Combine the saved X, Y, and Z numbers into one 3D position.
             spawnPosition = new Vec3(tag.getDouble(TAG_SPAWN_X), tag.getDouble(TAG_SPAWN_Y), tag.getDouble(TAG_SPAWN_Z));
         } else {
+            // Older or incomplete saves have no launch position, so use the entity's current position.
             spawnPosition = position();
         }
     }
