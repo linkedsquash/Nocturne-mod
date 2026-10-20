@@ -2,22 +2,36 @@ package net.michael.nocturne.world.entity.projectile;
 
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.ModEntities;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class WhipEntity extends Projectile {// the class declarations that tells it to inherit the Projectile class's properties
+
+public class WhipEntity extends Projectile { // A projectile entity that represents the whip tip.
 
     private WhipEntityState currentState = WhipEntityState.EXTENDING; // Tracks whether the tip is moving out or returning.
-    public static final double MAX_REACH = 32; // Maximum distance the tip travels from its launch point.
+    public static final double MAX_REACH = 8; // Maximum distance the tip travels from its launch point.
+
+    // Constructor used by Minecraft when loading or creating this entity by type.
+    public WhipEntity(EntityType<? extends WhipEntity> entityType, Level level) {
+        super(entityType, level); // Initialize the inherited Projectile state.
+        this.noCulling = false; // Allow Minecraft to cull this entity when it is outside the view.
+    }
+
 
     // Lets other code check whether the whip is extending or retracting.
     public WhipEntityState getCurrentState() {
@@ -36,19 +50,17 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         return currentState == WhipEntityState.EXTENDING;
     }
 
-    // Finds the normalized direction from the tip back to its owner.
+    // Returns the vector from the tip to the owner's eyes; it is not normalized.
     public Vec3 getRetractionDirection() {
         Player player = getPlayerOwner();
-        if (player == null) return Vec3.ZERO; // A missing owner gives no return direction.
+        if (player == null) return Vec3.ZERO; // Without a player owner, no return direction is available.
         return player.getEyePosition().subtract(this.position());
     }
 
     public void extendWhip() {
 
     }
-
-    // Returns true if the tip was given return movement; false if it was removed
-    // or is not currently retracting.
+    // Gives a retracting tip velocity toward its player's eyes; discards it if no player owns it.
     public void retractWhip() {
 
         Player player = getPlayerOwner();
@@ -64,36 +76,31 @@ public class WhipEntity extends Projectile {// the class declarations that tells
 
         Vec3 toPlayerDirection = getRetractionDirection();
 
-        // Already close enough to the target; don't normalize a tiny vector.
+        // Discard the tip when it is already within one block of the player's eyes.
         if (toPlayerDirection.lengthSqr() < 1.0) {
             this.discard();
             return;
         }
-
-        this.setDeltaMovement(toPlayerDirection.normalize().scale(1.5));
+        double distanceToPlayer = toPlayerDirection.length();
+        double returnSpeed = Math.min(1.0, distanceToPlayer);
+        this.setDeltaMovement(toPlayerDirection.normalize().scale(returnSpeed));
     }
+
     // Saved at launch and used to measure how far the tip has travelled.
-    // Change MAX_REACH below to adjust the maximum outbound distance.
+    // Used to measure outbound travel distance against MAX_REACH.
     private Vec3 spawnPosition = Vec3.ZERO;
 
-    // Constructor used by Minecraft when loading or creating this entity by type.
-    public WhipEntity(EntityType<? extends WhipEntity> entityType, Level level) {
-        super(entityType, level); // super(...) calls the constructor of the parent class, which in this case is Projectile.This is basically the constructor saying "Before finishing the setup of my WhipEntity, initialise the inherited Projectile part using these arguments."
-        this.noCulling = false;     // Minecraft can stop rendering it when it considers it outside the relevant view
-    }
+
 
     // Creates a whip tip at the player's eyes and launches it in their look direction.
     public WhipEntity(Player player, Level level) {
-        this(ModEntities.WHIP_TIPS.get(), level); // this(...) delegates the other constructor in the same class which then calls super(...) to initialize the parent 'Projectile' class
-        this.setOwner(player); //sets this WHIP_TIPS instance to belong to the player that used the whip
-        float playerXRot = player.getXRot(); //get the x rotation of the player
-        float playerYRot = player.getYRot(); //get the y rotation of the player
-        double playerX = player.getX(); // the players X Co-ord
-        double playerEyeY = player.getEyeY();// represents the vertical position of the player's eyes
-        double playerZ = player.getZ(); // the players Z Co-ord
-        Vec3 lookDirection = player.getLookAngle(); //The result is a vector containing the X, Y and Z components of the player's viewing direction.
-        Vec3 lookPosition = player.getEyePosition().add(lookDirection.scale(0.5)); // gives you the player's eye position as a Vec3, 0.5 moves that position half a block forward along the look direction.
-        this.moveTo( //sets the whip's starting position
+        this(ModEntities.WHIP_TIPS.get(), level); // Create the entity using the type-based constructor.
+        this.setOwner(player); // Record which player launched this whip tip.
+        float playerXRot = player.getXRot(); // Player pitch.
+        float playerYRot = player.getYRot(); // Player yaw.
+        Vec3 lookDirection = player.getLookAngle(); // The player's normalized viewing direction.
+        Vec3 lookPosition = player.getEyePosition().add(lookDirection.scale(0.5)); // Start half a block ahead of the player's eyes.
+        this.moveTo( // Set the whip tip's starting position and orientation.
                 lookPosition.x,
                 lookPosition.y,
                 lookPosition.z,
@@ -102,8 +109,7 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         );
         this.spawnPosition = this.position(); // Save the launch point for the reach calculation.
         this.setDeltaMovement(lookDirection.scale(1.5));
-        //Here, scale(1.5) multiplies all three components by 1.5,
-        // and setDeltaMovement(...) assigns the resulting vector as the entity's velocity.
+        // Launch the tip at 1.5 blocks per tick along the player's look direction.
 
     }
 
@@ -114,40 +120,33 @@ public class WhipEntity extends Projectile {// the class declarations that tells
     }
 
 
-    public int retrieve() { //declares the retrieve method that the WhipItem class uses which returns an int value
-        this.discard(); // destroys the whip entity when the retrieve method is run
-        return 1; // supplies the durability damage amount to WhipItem.hurtAndBreak()
+    public int retrieve() { // Remove this tip and return the durability damage amount to the caller.
+        this.discard();
+        return 1;
     }
 
     public static WhipEntity findActive(Player player) { // Finds the player's first active whip tip.
-        // It's the method call that performs the search; the declaration creates the variable that holds the results.
-        List<WhipEntity> tips = player.level().getEntitiesOfClass( //'List<WhipEntity> tips' declares a variable that can hold a list of WhipEntity references.
-                // The call to getEntitiesOfClass(...) asks Minecraft to find matching entities in the level.
-                WhipEntity.class, //Tells the method to search for the WhipEntity.Class
-                player.getBoundingBox().inflate(32.0D), // sets the range in which it searches for whip entities.
-                // it takes the player's bounding box and expands it by 40 blocks along each axis.
-                tip -> tip.getOwner() == player); //a lambda expression that tells the method to find any entities belonging to the player
-        return tips.isEmpty() ? null : tips.get(0); // returns null if it doesn't find any, and grabs the first one it finds if it does
-        //The ? : syntax is called the ternary operator. It chooses between two values depending on a condition.
-        //tips.isEmpty() checks whether the list contains no elements.
-        //null is returned if the list is empty.
-        //tips.get(0) returns the first element if the list isn't empty.
+        List<WhipEntity> tips = player.level().getEntitiesOfClass(
+                WhipEntity.class, // Search for whip tips.
+                player.getBoundingBox().inflate(32.0D), // Expand the player's bounding box by 32 blocks on each axis.
+                tip -> tip.getOwner() == player); // Keep only tips owned by this player.
+        return tips.isEmpty() ? null : tips.get(0); // Return null when none are found, otherwise return the first match.
 
     }
 
-    public boolean mustRetractWhip(Player player) { //declares boolean Method that passes the Player as a parameter
-        ItemStack itemStack = player.getMainHandItem(); //gets the item in the players main hand
-        ItemStack itemStack2 = player.getOffhandItem(); //gets the item in the players off-hand
-        boolean bl = itemStack.is(ModItems.WHIP.get()); // the bl checks if the item in the players hand is the ModItems.WHIP
+    public boolean mustRetractWhip(Player player) { // Discard the tip if its owner is invalid or no longer holds a whip.
+        ItemStack itemStack = player.getMainHandItem(); // Get the main-hand item.
+        ItemStack itemStack2 = player.getOffhandItem(); // Get the off-hand item.
+        boolean bl = itemStack.is(ModItems.WHIP.get()); // Check whether the main hand holds the whip.
         boolean bl2 = itemStack2.is(ModItems.WHIP.get()); // Check whether the whip is in the offhand.
         // Retracting tips may be farther away than the extension limit.
         // This method only checks whether the owner is valid and still holding
         // the whip. The distance limit is checked in tick(), where reaching it
         // changes the state to RETRACTING instead of deleting the tip.
         if (!player.isRemoved() && player.isAlive() && (bl || bl2)) {
-            return false; //If all the conditions are met, the method returns false without discarding the entity.
+            return false; // The owner is valid and still holds the whip.
         }
-        this.discard(); //if not all conditions are met retractWhip discards the Whip entity
+        this.discard(); // Remove the tip when the owner is invalid or has put the whip away.
         return true;
 
     }
@@ -156,7 +155,7 @@ public class WhipEntity extends Projectile {// the class declarations that tells
     public void tick() {
         super.tick();
 
-        Player player = this.getPlayerOwner(); // Get the player this tip belongs to.
+        Player player = this.getPlayerOwner(); // Get the player that owns this tip.
         double distanceTravelled = this.position().distanceTo(spawnPosition);
 
 
@@ -164,7 +163,12 @@ public class WhipEntity extends Projectile {// the class declarations that tells
             this.discard();
             return;
         }
-        this.move(MoverType.SELF, this.getDeltaMovement());   // Apply movement
+        // Collision callbacks can change state or damage entities, so run them
+        // only on the authoritative side and only while the tip is outbound.
+        if (!this.level().isClientSide && currentState == WhipEntityState.EXTENDING) {
+            this.checkCollision();
+        }
+        this.move(MoverType.SELF, this.getDeltaMovement()); // Move the tip using its current velocity.
 
 
         if (!this.level().isClientSide) {
@@ -195,25 +199,52 @@ public class WhipEntity extends Projectile {// the class declarations that tells
         }
     }
 
+    private void checkCollision() {
+        HitResult hitResult =
+                ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+        this.onHit(hitResult);
+    }
+
     @Override
-    // Render the whip tip while it is within 64 blocks of the camera.
+    protected void onHitBlock(BlockHitResult hit) {
+        // The default projectile block-hit handler discards the projectile.
+        // Keep the tip alive and let tick() bring it back to its owner.
+        this.setCurrentState(WhipEntityState.RETRACTING);
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult hit) {
+        super.onHitEntity(hit);
+        this.setCurrentState(WhipEntityState.RETRACTING);
+        Entity target = hit.getEntity();
+        float damage = 8.0F;
+        DamageSource damageSource = this.damageSources().playerAttack(getPlayerOwner() == null ? null : getPlayerOwner());
+        target.hurt(damageSource, damage);
+    }
+
+    @Override
+    // Render when the squared camera distance is less than 64 squared (4096), or 64 blocks.
     public boolean shouldRenderAtSqrDistance(double distance) {
-        double e = 64.0;
         return distance < 4096.0;
     }
 
     @Override
-    // Whip tips stay in their current dimension.
+    // Prevent this entity from being transferred between dimensions.
     public boolean canChangeDimensions() {
         return false;
     }
 
     @Nullable
-    // Return the owner only when it is a player.
+    // Return the owner as a Player, or null when the owner is another entity or absent.
     public Player getPlayerOwner() {
         Entity entity = getOwner();
         return entity instanceof Player ? (Player) entity : null;
     }
+    @Override
+    public boolean canHitEntity(Entity entity) {
+        return entity instanceof LivingEntity;
+    }
+
 
 
     public enum WhipEntityState { // The three movement states used by the whip tip.

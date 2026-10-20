@@ -46,7 +46,7 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
 
             // Convert the player's eye position from world coordinates into
             // coordinates relative to the whip entity.
-            Vec3 playerEyeLocal = player.getEyePosition(partialTick)
+            Vec3 playerHandLocal = player.getRopeHoldPosition(partialTick)
                     .subtract(entity.position());
 
             // Ask for a buffer that interprets each pair of vertices as a line.
@@ -57,7 +57,7 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
 
             // Submit the second endpoint: the player's eye position.
             // Together, these two vertices describe one line segment.
-            addLineVertex(line, poseStack, playerEyeLocal);
+            addLineVertex(line, poseStack, playerHandLocal);
 
             poseStack.popPose();
         }

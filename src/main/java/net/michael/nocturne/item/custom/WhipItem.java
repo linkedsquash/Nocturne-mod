@@ -34,7 +34,9 @@ public class WhipItem extends Item implements Vanishable {
 
             if(!level.isClientSide){ // Checks that the code is running on the server side, so the entity removal and durability changes happen on the authoritative side.
 
-                    int i = tip.retrieve();     // Calls the WhipEntity's retrieve() method, which discards the entity and returns the durability damage amount.
+                // A second use recalls the tip. The entity will discard itself
+                // only after it reaches the player's eyes.
+                tip.setCurrentState(WhipEntity.WhipEntityState.RETRACTING);
                 level.playSound(                //tells minecraft to play a sound based on what the if statement finds
 
                         null,
@@ -46,7 +48,7 @@ public class WhipItem extends Item implements Vanishable {
                         5.0F,
                         0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
                 );
-                itemStack.hurtAndBreak(i, player, playerx -> playerx.broadcastBreakEvent(interactionHand)); // If the item breaks, the lambda tells Minecraft to broadcast the break event for the hand holding the Whip.
+                itemStack.hurtAndBreak(1, player, playerx -> playerx.broadcastBreakEvent(interactionHand)); // If the item breaks, the lambda tells Minecraft to broadcast the break event for the hand holding the Whip.
                 }
 
 
