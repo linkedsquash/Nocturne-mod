@@ -1,51 +1,25 @@
 package net.michael.nocturne;
 
-import com.mojang.logging.LogUtils;
 import net.michael.nocturne.block.ModBlocks;
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.ModEntities;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.slf4j.Logger;
 
 @Mod(Nocturne.MOD_ID)
 public class Nocturne {
-    // Define mod id in a common place for everything to reference
+    // Minecraft uses this ID to find this mod's registrations and resources.
     public static final String MOD_ID = "nocturne";
-    // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
 
+    // Forge calls this constructor when it loads the mod.
     public Nocturne(FMLJavaModLoadingContext context) {
+        // Get the event bus used to register this mod's content during startup.
         IEventBus modEventBus = context.getModEventBus();
-
+        // Register each group so Minecraft knows about the mod's entities, items, blocks, and creative tab.
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
-
-        // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
-
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
-
     }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-
-    }
-
-    // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event)
-    {
-
-        }
-    }
-
+}

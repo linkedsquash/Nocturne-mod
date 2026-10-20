@@ -2,6 +2,10 @@ package net.michael.nocturne.world.entity.projectile;
 
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.ModEntities;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,10 +25,20 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 
-public class WhipEntity extends Projectile { // A projectile entity that represents the whip tip.
+public class WhipEntity extends Projectile {
 
-    private WhipEntityState currentState = WhipEntityState.EXTENDING; // Tracks whether the tip is moving out or returning.
+    // Maximum distance, in blocks, that the whip tip may travel away from where it launched.
     public static final double MAX_REACH = 8; // Maximum distance the tip travels from its launch point.
+    // Names used to store the whip's state and launch coordinates in a saved entity.
+    private static final String TAG_STATE = "WhipState";
+    private static final String TAG_SPAWN_X = "SpawnX";
+    private static final String TAG_SPAWN_Y = "SpawnY";
+    private static final String TAG_SPAWN_Z = "SpawnZ";
+    // Shared key used to synchronize the whip state between the server and client.
+    private static final EntityDataAccessor<Integer> DATA_STATE =
+            SynchedEntityData.defineId(WhipEntity.class, EntityDataSerializers.INT);
+    // Position where this whip tip started, used to measure its travel distance.
+    private Vec3 spawnPosition = Vec3.ZERO;
 
     // Constructor used by Minecraft when loading or creating this entity by type.
     public WhipEntity(EntityType<? extends WhipEntity> entityType, Level level) {
@@ -33,21 +47,22 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
     }
 
 
-    // Lets other code check whether the whip is extending or retracting.
     public WhipEntityState getCurrentState() {
-        return currentState;
+        int value = this.entityData.get(DATA_STATE);
+        // Convert the saved number into one of the named states, such as EXTENDING or RETRACTING.
+        WhipEntityState[] states = WhipEntityState.values();
+        // Check the number first so an unexpected value cannot cause an array-index error.
+        // If it is outside the valid range, use EXTENDING as a safe default.
+        return value >= 0 && value < states.length ? states[value] : WhipEntityState.EXTENDING;
     }
 
-    public WhipEntityState setCurrentState(WhipEntityState state) {
-        return currentState = state;
+    public void setCurrentState(WhipEntityState state) {
+        this.entityData.set(DATA_STATE, state.ordinal());
     }
 
     public boolean checkRETRACTING() {
-        return currentState == WhipEntityState.RETRACTING;
-    }
-
-    public boolean checkEXTENDING() {
-        return currentState == WhipEntityState.EXTENDING;
+        // Return true only when the tip is currently travelling back to its owner.
+        return getCurrentState() == WhipEntityState.RETRACTING;
     }
 
     // Returns the vector from the tip to the owner's eyes; it is not normalized.
@@ -57,9 +72,6 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
         return player.getEyePosition().subtract(this.position());
     }
 
-    public void extendWhip() {
-
-    }
     // Gives a retracting tip velocity toward its player's eyes; discards it if no player owns it.
     public void retractWhip() {
 
@@ -86,12 +98,6 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
         this.setDeltaMovement(toPlayerDirection.normalize().scale(returnSpeed));
     }
 
-    // Saved at launch and used to measure how far the tip has travelled.
-    // Used to measure outbound travel distance against MAX_REACH.
-    private Vec3 spawnPosition = Vec3.ZERO;
-
-
-
     // Creates a whip tip at the player's eyes and launches it in their look direction.
     public WhipEntity(Player player, Level level) {
         this(ModEntities.WHIP_TIPS.get(), level); // Create the entity using the type-based constructor.
@@ -112,17 +118,35 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
         // Launch the tip at 1.5 blocks per tick along the player's look direction.
 
     }
-
-
-    // No extra synchronized data is needed for this entity.
     @Override
     protected void defineSynchedData() {
+        this.entityData.define(DATA_STATE, WhipEntityState.EXTENDING.ordinal());
     }
 
+    @Override
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putString(TAG_STATE, getCurrentState().name());
+        tag.putDouble(TAG_SPAWN_X, spawnPosition.x);
+        tag.putDouble(TAG_SPAWN_Y, spawnPosition.y);
+        tag.putDouble(TAG_SPAWN_Z, spawnPosition.z);
+    }
 
-    public int retrieve() { // Remove this tip and return the durability damage amount to the caller.
-        this.discard();
-        return 1;
+    @Override
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains(TAG_STATE)) {
+            try {
+                setCurrentState(WhipEntityState.valueOf(tag.getString(TAG_STATE)));
+            } catch (IllegalArgumentException ignored) {
+                setCurrentState(WhipEntityState.EXTENDING);
+            }
+        }
+        if (tag.contains(TAG_SPAWN_X) && tag.contains(TAG_SPAWN_Y) && tag.contains(TAG_SPAWN_Z)) {
+            spawnPosition = new Vec3(tag.getDouble(TAG_SPAWN_X), tag.getDouble(TAG_SPAWN_Y), tag.getDouble(TAG_SPAWN_Z));
+        } else {
+            spawnPosition = position();
+        }
     }
 
     public static WhipEntity findActive(Player player) { // Finds the player's first active whip tip.
@@ -156,8 +180,6 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
         super.tick();
 
         Player player = this.getPlayerOwner(); // Get the player that owns this tip.
-        double distanceTravelled = this.position().distanceTo(spawnPosition);
-
 
         if (player == null) {
             this.discard();
@@ -165,16 +187,17 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
         }
         // Collision callbacks can change state or damage entities, so run them
         // only on the authoritative side and only while the tip is outbound.
-        if (!this.level().isClientSide && currentState == WhipEntityState.EXTENDING) {
+        if (!this.level().isClientSide && getCurrentState() == WhipEntityState.EXTENDING) {
             this.checkCollision();
         }
         this.move(MoverType.SELF, this.getDeltaMovement()); // Move the tip using its current velocity.
+        double distanceTravelled = this.position().distanceTo(spawnPosition);
 
 
         if (!this.level().isClientSide) {
             Vec3 playerEyePosition = player.getEyePosition();
 
-            if (currentState == WhipEntityState.EXTENDING && (distanceTravelled >= MAX_REACH
+            if (getCurrentState() == WhipEntityState.EXTENDING && (distanceTravelled >= MAX_REACH
                     || this.distanceToSqr(playerEyePosition) >= MAX_REACH * MAX_REACH))
             {
                 setCurrentState(WhipEntityState.RETRACTING);
@@ -182,7 +205,7 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
             // This handles owner death/removal or switching away from
             // the whip. It deliberately does not enforce travel range.
             if (!this.mustRetractWhip(player)) {
-                if (currentState == WhipEntityState.RETRACTING)
+                if (getCurrentState() == WhipEntityState.RETRACTING)
                 {
                     // Stop once close enough to the player's Eye. Adjust
                     // 1 to change the catch radius (it is squared distance).
@@ -218,8 +241,16 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
         this.setCurrentState(WhipEntityState.RETRACTING);
         Entity target = hit.getEntity();
         float damage = 8.0F;
-        DamageSource damageSource = this.damageSources().playerAttack(getPlayerOwner() == null ? null : getPlayerOwner());
-        target.hurt(damageSource, damage);
+        // Keep the owner in a variable so we can check that it really is a player before using it.
+        Player playerOwner = getPlayerOwner();
+        // A player is needed to create this type of damage source, so only apply damage when one exists.
+        if (playerOwner != null) {
+            DamageSource damageSource = this.damageSources().playerAttack(playerOwner);
+            target.hurt(damageSource, damage);
+        } else {
+            // This whip has no player owner, so remove it instead of attempting player-sourced damage.
+            this.discard();
+        }
     }
 
     @Override
@@ -242,14 +273,18 @@ public class WhipEntity extends Projectile { // A projectile entity that represe
     }
     @Override
     public boolean canHitEntity(Entity entity) {
-        return entity instanceof LivingEntity;
+        return entity != getOwner() && entity instanceof LivingEntity livingEntity
+                && livingEntity.isAlive() && !livingEntity.isSpectator();
     }
 
 
 
     public enum WhipEntityState { // The three movement states used by the whip tip.
+        // The tip is travelling away from the player.
         EXTENDING,
+        // The tip is travelling back toward the player.
         RETRACTING,
+        // Reserved state for a tip that is not extending or retracting.
         IDLE
     }
 }

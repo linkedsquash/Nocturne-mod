@@ -50,9 +50,6 @@ public class WhipItem extends Item implements Vanishable {
                 );
                 itemStack.hurtAndBreak(1, player, playerx -> playerx.broadcastBreakEvent(interactionHand)); // If the item breaks, the lambda tells Minecraft to broadcast the break event for the hand holding the Whip.
                 }
-
-
-                player.gameEvent(GameEvent.ITEM_INTERACT_FINISH);   //Notifies Minecraft that the item interaction has finished.
         }
         else
         {
@@ -71,6 +68,10 @@ public class WhipItem extends Item implements Vanishable {
                 level.addFreshEntity(new WhipEntity(player ,level )); //The entity is constructed by new WhipEntity(player, level), and the world is then asked to add it. THIS IS WHERE THE WHIP ENTITY IS ACTUALLY CREATED
             }
 
+        }
+        // Minecraft runs item-use code on both the client and server. Fire this event only on the server so it is not handled twice.
+        if (!level.isClientSide) {
+            player.gameEvent(GameEvent.ITEM_INTERACT_FINISH); // Notify Minecraft that the interaction has finished.
         }
         return  InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide()); //The method returns an InteractionResultHolder to the code that called use()
 

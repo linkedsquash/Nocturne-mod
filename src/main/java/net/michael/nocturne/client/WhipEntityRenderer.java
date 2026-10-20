@@ -33,18 +33,20 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
             MultiBufferSource buffer,
             int packedLight
     ) {
+        // Find the player who launched this whip so the renderer can draw the line back to them.
         Player player = entity.getPlayerOwner();
 
         // The renderer's pose is already positioned at the whip entity.
         // Draw the connecting line only if the owner still exists.
         if (player != null) {
+            // Save the current drawing position so our temporary changes can be undone afterward.
             poseStack.pushPose();
 
             // The whip tip is at the local origin because this renderer is
             // positioned at the entity.
             Vec3 tipLocal = Vec3.ZERO;
 
-            // Convert the player's eye position from world coordinates into
+            // Convert the player's hand position from world coordinates into
             // coordinates relative to the whip entity.
             Vec3 playerHandLocal = player.getRopeHoldPosition(partialTick)
                     .subtract(entity.position());
@@ -55,7 +57,7 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
             // Submit the first endpoint: the whip tip.
             addLineVertex(line, poseStack, tipLocal);
 
-            // Submit the second endpoint: the player's eye position.
+            // Submit the second endpoint: the player's hand position.
             // Together, these two vertices describe one line segment.
             addLineVertex(line, poseStack, playerHandLocal);
 
@@ -64,8 +66,13 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
 
         // Draw the blood block centered on the whip entity as a temporary
         // visual marker for the tip.
+        // Save the drawing position before moving and resizing the marker.
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        // Shift the cube so scaling it makes it centered on the entity.
+        poseStack.translate(-0.25D, -0.25D, -0.25D);
+        // Shrink the full block model to half size for the whip tip marker.
+        poseStack.scale(0.5F, 0.5F, 0.5F);
+
 
         blockRenderer.renderSingleBlock(
                 ModBlocks.BLOOD_BLOCK.get().defaultBlockState(),
@@ -75,6 +82,7 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
                 OverlayTexture.NO_OVERLAY
         );
 
+        // Restore the drawing position so the marker's shift and scale do not affect later rendering.
         poseStack.popPose();
 
         // Let the base renderer perform any standard entity-renderer work.
@@ -83,7 +91,6 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
 
     /**
      * Adds one vertex to the line buffer.
-     *
      * A vertex is one 3D point. A line needs two vertices, so this helper
      * is called once for each endpoint.
      */
