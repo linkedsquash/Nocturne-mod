@@ -6,5 +6,8 @@
   "block.nocturne.blood_block":"Bloodstone block",
   "block.nocturne.bloodstone_ore": "Bloodstone ore",
 
-  "creativetab.nocturne_tab":"Nocturne"
+  "creativetab.nocturne_tab":"Nocturne",
+  "key.categories.nocturne": "Nocturne",
+  "key.nocturne.lash_key": "Lash",
+  "key.nocturne.sweep_key": "Sweep"
 }

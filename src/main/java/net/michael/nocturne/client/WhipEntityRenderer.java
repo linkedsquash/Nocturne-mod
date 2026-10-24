@@ -42,9 +42,10 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
             // Save the current drawing position so our temporary changes can be undone afterward.
             poseStack.pushPose();
 
-            // The whip tip is at the local origin because this renderer is
-            // positioned at the entity.
+            //starts at the entity's hitbox centre
+            // offset so the tip is centre
             Vec3 tipLocal = Vec3.ZERO;
+            poseStack.translate(-0.5, 0.5, -0.5);
 
             // Convert the player's hand position from world coordinates into
             // coordinates relative to the whip entity.
@@ -69,9 +70,9 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
         // Save the drawing position before moving and resizing the marker.
         poseStack.pushPose();
         // Shift the cube so scaling it makes it centered on the entity.
-        poseStack.translate(-0.25D, -0.25D, -0.25D);
+        poseStack.translate(-0.5, 0, -0.5);
         // Shrink the full block model to half size for the whip tip marker.
-        poseStack.scale(0.5F, 0.5F, 0.5F);
+        poseStack.scale(1F, 1F, 1F);
 
 
         blockRenderer.renderSingleBlock(

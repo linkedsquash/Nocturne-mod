@@ -4,7 +4,6 @@ import net.michael.nocturne.Nocturne;
 import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -18,12 +17,12 @@ public class ModEntities {
     public static final RegistryObject<EntityType<WhipEntity>> WHIP_TIPS = ENTITY_TYPES.register(
             "whip_tips",
             () -> EntityType.Builder.<WhipEntity>of(WhipEntity::new, MobCategory.MISC)
-                    // Set the tip's collision size to one quarter of a block in each direction.
-                    .sized(0.25F, 0.25F)
+                    // Set the tip's HitBox size to one quarter of a block in each direction.
+                    .sized(1F, 1F)
                     // Send updates to clients within four chunks of the entity.
                     .clientTrackingRange(4)
                     // Send position updates every five ticks.
-                    .updateInterval(5)
+                    .updateInterval(1)
                     .build("whip_tips")
     );
 

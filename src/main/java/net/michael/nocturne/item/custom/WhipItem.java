@@ -1,13 +1,16 @@
 package net.michael.nocturne.item.custom;
 
 //imports from other classes
+
 import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Vanishable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
@@ -17,14 +20,14 @@ public class WhipItem extends Item implements Vanishable {
     public WhipItem(final Properties properties)
     {
         super(properties);        //calls the constructor of the parent class, Item, and passes it the item settings. Expressions from the ModItem class eventually end up here
-
-
     }
+
+
     //overrides a method from another class
     @Override
-    //the return TYPE that tells minecraft that it is for an item stack
+    //the return TYPE that tells Minecraft that it is for an item stack
     // Declares the use method and tells it to accept the Level, Player,and interaction hand as parameters,
-    // minecraft calls the use method when the whip is used
+    // Minecraft calls the use method when the whip is used
     public InteractionResultHolder<ItemStack> use( Level level,  Player player, InteractionHand interactionHand){        //after this bracket is what the use method is told to do with the WhipItem,
         ItemStack itemStack = player.getItemInHand(interactionHand);  // then it retrieves the item held in the interaction hand and stores it to apply the durability damage later
 
@@ -34,9 +37,7 @@ public class WhipItem extends Item implements Vanishable {
 
             if(!level.isClientSide){ // Checks that the code is running on the server side, so the entity removal and durability changes happen on the authoritative side.
 
-                // A second use recalls the tip. The entity will discard itself
-                // only after it reaches the player's eyes.
-                tip.setCurrentState(WhipEntity.WhipEntityState.RETRACTING);
+                tip.retrieve();
                 level.playSound(                //tells minecraft to play a sound based on what the if statement finds
 
                         null,
@@ -48,7 +49,6 @@ public class WhipItem extends Item implements Vanishable {
                         5.0F,
                         0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
                 );
-                itemStack.hurtAndBreak(1, player, playerx -> playerx.broadcastBreakEvent(interactionHand)); // If the item breaks, the lambda tells Minecraft to broadcast the break event for the hand holding the Whip.
                 }
         }
         else
