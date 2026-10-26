@@ -1,6 +1,7 @@
 package net.michael.nocturne;
 
 import net.michael.nocturne.block.ModBlocks;
+import net.michael.nocturne.item.ModCreativeModeTabs;
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.network.ModPacketHandler;
 import net.michael.nocturne.world.entity.ModEntities;

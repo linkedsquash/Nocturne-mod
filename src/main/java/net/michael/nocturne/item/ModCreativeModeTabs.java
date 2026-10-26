@@ -1,7 +1,7 @@
-package net.michael.nocturne;
+package net.michael.nocturne.item;
 
+import net.michael.nocturne.Nocturne;
 import net.michael.nocturne.block.ModBlocks;
-import net.michael.nocturne.item.ModItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -26,9 +26,12 @@ public class ModCreativeModeTabs {
                     .displayItems((pParameter, pOutput) -> {
                         pOutput.accept(ModItems.WHIP.get());
                         pOutput.accept(ModItems.BLOODSTONE.get());
+                        pOutput.accept(ModItems.BLOOD_PEACH.get());
+                        pOutput.accept(ModItems.EXPLOSIVE_STONE.get());
 
                         pOutput.accept(ModBlocks.BLOOD_BLOCK.get());
                         pOutput.accept(ModBlocks.BLOODSTONE_ORE.get());
+                        pOutput.accept(ModBlocks.MAGIC_BLOCK.get());
                     })
                     .build());
 

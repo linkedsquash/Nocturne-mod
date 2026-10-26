@@ -1,4 +1,4 @@
-package net.michael.nocturne.network;
+package net.michael.nocturne.network.packets;
 
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.world.entity.projectile.WhipEntity;

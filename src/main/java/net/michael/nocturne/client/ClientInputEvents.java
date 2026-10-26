@@ -3,7 +3,7 @@ package net.michael.nocturne.client;
 import net.michael.nocturne.Nocturne;
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.network.ModPacketHandler;
-import net.michael.nocturne.network.SweepAttackPacket;
+import net.michael.nocturne.network.packets.SweepAttackPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;

@@ -1,6 +1,7 @@
 package net.michael.nocturne.network;
 
 import net.michael.nocturne.Nocturne;
+import net.michael.nocturne.network.packets.SweepAttackPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;

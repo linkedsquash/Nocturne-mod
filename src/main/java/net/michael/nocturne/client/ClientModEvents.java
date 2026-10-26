@@ -1,12 +1,11 @@
 package net.michael.nocturne.client;
 
 import net.michael.nocturne.Nocturne;
+import net.michael.nocturne.client.renderer.WhipEntityRenderer;
 import net.michael.nocturne.world.entity.ModEntities;
 //import net.minecraft.client.renderer.entity.NoopRenderer;
-import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 

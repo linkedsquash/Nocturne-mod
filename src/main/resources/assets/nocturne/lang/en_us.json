@@ -1,8 +1,10 @@
 {
   "item.nocturne.whip":"Whip",
-
+  "item.nocturne.blood_peach":"Blood Peach",
   "item.nocturne.bloodstone":"Bloodstone",
+  "item.nocturne.explosive_stone": "Explosive stone",
 
+  "block.nocturne.magic_block":"Magic block",
   "block.nocturne.blood_block":"Bloodstone block",
   "block.nocturne.bloodstone_ore": "Bloodstone ore",
 
