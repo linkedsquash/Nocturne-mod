@@ -76,7 +76,7 @@ public class WhipEntityRenderer extends EntityRenderer<WhipEntity> {
 
 
         blockRenderer.renderSingleBlock(
-                ModBlocks.BLOOD_BLOCK.get().defaultBlockState(),
+                ModBlocks.BLOODSTONE_BLOCK.get().defaultBlockState(),
                 poseStack,
                 buffer,
                 packedLight,

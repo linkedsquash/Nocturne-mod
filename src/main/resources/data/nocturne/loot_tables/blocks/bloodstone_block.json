@@ -14,13 +14,13 @@
       [
         {
           "type": "minecraft:item",
-          "name": "nocturne:blood_block"
+          "name": "nocturne:bloodstone_block"
         }
       ],
       "rolls": 1.0
     }
   ],
-"random_sequence": "nocturne:blocks/blood_block"
+"random_sequence": "nocturne:blocks/bloodstone_block"
 }
 
 

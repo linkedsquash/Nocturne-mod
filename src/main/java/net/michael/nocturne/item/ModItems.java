@@ -5,6 +5,7 @@ import net.michael.nocturne.item.custom.BloodPeachItem;
 import net.michael.nocturne.item.custom.FuelItem;
 import net.michael.nocturne.item.custom.WhipItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;

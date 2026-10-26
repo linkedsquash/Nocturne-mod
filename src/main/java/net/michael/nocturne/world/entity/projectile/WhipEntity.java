@@ -54,6 +54,16 @@ public class WhipEntity extends Projectile {
     private static final int SWEEP_HIT_COOLDOWN = 10;
     private final Map<UUID, Long> lastSweepHitTick = new HashMap<>();
 
+    public float sweepDamage = 4F;
+    public float lashDamage = 8F;
+
+    public double getSweepDamage() {
+        return this.sweepDamage;
+    }
+    public double getLashDamage() {
+        return this.lashDamage;
+    }
+
 
     // Constructor used by Minecraft when loading or creating this entity by type.
     public WhipEntity(EntityType<? extends WhipEntity> entityType, Level level) {
@@ -278,7 +288,7 @@ public class WhipEntity extends Projectile {
             Long lastHit = lastSweepHitTick.get(target.getUUID());
             if (lastHit != null && now - lastHit < SWEEP_HIT_COOLDOWN) continue;
             Player owner = getPlayerOwner();
-            if (owner != null && target.hurt(damageSources().playerAttack(owner), 8.0F)) {
+            if (owner != null && target.hurt(damageSources().playerAttack(owner), sweepDamage)) {
                 lastSweepHitTick.put(target.getUUID(), now);
                 damageWhip(owner);
             }
@@ -298,7 +308,7 @@ public class WhipEntity extends Projectile {
         if (sweepHeld) return;
         this.setCurrentState(WhipEntityState.RETRACTING);
         Entity target = hit.getEntity();
-        float damage = 8.0F;
+        float damage = lashDamage;
         // Keep the owner in a variable so we can check that it really is a player before using it.
         Player playerOwner = getPlayerOwner();
         // A player is needed to create this type of damage source, so only apply damage when one exists.

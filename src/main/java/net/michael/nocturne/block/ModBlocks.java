@@ -21,7 +21,7 @@ public class ModBlocks {
             DeferredRegister.create(ForgeRegistries.BLOCKS, Nocturne.MOD_ID);
 
         // Register a block that copies the strength and other basic properties of a diamond block.
-        public static final RegistryObject<Block> BLOOD_BLOCK = registerBlock("blood_block",
+        public static final RegistryObject<Block> BLOODSTONE_BLOCK = registerBlock("blood_block",
                 () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).strength(2.0F).requiresCorrectToolForDrops()));
 
         // Register an ore block that drops between 3 and 6 experience when mined correctly.

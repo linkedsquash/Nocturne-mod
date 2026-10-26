@@ -1,6 +1,6 @@
 {"parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "nocturne:block/blood_block"
+    "all": "nocturne:block/bloodstone_block"
   }
 
 }
