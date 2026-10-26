@@ -3,10 +3,16 @@
   "item.nocturne.blood_peach":"Blood Peach",
   "item.nocturne.bloodstone":"Bloodstone",
   "item.nocturne.explosive_stone": "Explosive stone",
+  "item.nocturne.tin_ingot": "Tin ingot",
+  "item.nocturne.tin_raw": "Tin raw",
+  "item.nocturne.bronze_ingot": "Bronze ingot",
+
 
   "block.nocturne.magic_block":"Magic block",
   "block.nocturne.bloodstone_block":"Bloodstone block",
   "block.nocturne.bloodstone_ore": "Bloodstone ore",
+  "block.nocturne.tin_ore": "Tin ore",
+
 
   "creativetab.nocturne_tab":"Nocturne",
   "key.categories.nocturne": "Nocturne",

@@ -28,7 +28,11 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.BLOODSTONE.get());
                         pOutput.accept(ModItems.BLOOD_PEACH.get());
                         pOutput.accept(ModItems.EXPLOSIVE_STONE.get());
+                        pOutput.accept(ModItems.BRONZE_INGOT.get());
+                        pOutput.accept(ModItems.TIN_INGOT.get());
+                        pOutput.accept(ModItems.RAW_TIN.get());
 
+                        pOutput.accept(ModBlocks.TIN_ORE.get());
                         pOutput.accept(ModBlocks.BLOODSTONE_BLOCK.get());
                         pOutput.accept(ModBlocks.BLOODSTONE_ORE.get());
                         pOutput.accept(ModBlocks.MAGIC_BLOCK.get());

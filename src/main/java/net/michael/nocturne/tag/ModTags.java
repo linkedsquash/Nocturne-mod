@@ -14,13 +14,15 @@ public class ModTags {
 
     public static class Blocks {
 
-        public static final TagKey<Block> BLOOD_BLOCKS = tag("blood_blocks");
+        public static final TagKey<Block> BLOCKS = tag("BLOCKS");
 
         private static TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(Nocturne.MOD_ID, name));
         };
     }
     public static class Items {
+
+        public static final TagKey<Item> TIN = tag("tin");
 
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(Nocturne.MOD_ID, name));
