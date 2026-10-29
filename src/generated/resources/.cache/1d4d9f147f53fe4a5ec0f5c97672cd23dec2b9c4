@@ -1,0 +1,10 @@
+// 1.20.1	2026-10-28T01:01:35.641519	Tags for minecraft:block mod id nocturne
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/forge/tags/blocks/needs_netherite_tool.json
+43028c2866d30b56e81ae57edf333d3a72c728f4 data/forge/tags/blocks/ores.json
+23c0e1d3bbc9caf0c69efda2abc7b949dcbb054b data/minecraft/tags/blocks/fences.json
+23c0e1d3bbc9caf0c69efda2abc7b949dcbb054b data/minecraft/tags/blocks/fence_gates.json
+7a5301e0bdd9b9f6a957ecf08481ada327a33f28 data/minecraft/tags/blocks/mineable/pickaxe.json
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/needs_diamond_tool.json
+a083eeb0ea11ddc16a43eca9eb34e6739cf166ba data/minecraft/tags/blocks/needs_iron_tool.json
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/needs_stone_tool.json
+9025e83b0fcfcef0b40cc714d4a9108b06e2d581 data/minecraft/tags/blocks/walls.json

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "nocturne:tin_block"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "item": "nocturne:tin_ingot"
+  }
+}

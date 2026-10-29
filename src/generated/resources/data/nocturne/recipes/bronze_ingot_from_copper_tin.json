@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": {
+      "tag": "forge:ingots/copper"
+    },
+    "t": {
+      "item": "nocturne:tin_ingot"
+    }
+  },
+  "pattern": [
+    "ccc",
+    "cct",
+    "ttt"
+  ],
+  "result": {
+    "item": "nocturne:bronze_ingot"
+  },
+  "show_notification": true
+}
