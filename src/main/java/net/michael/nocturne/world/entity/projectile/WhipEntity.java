@@ -1,11 +1,13 @@
 package net.michael.nocturne.world.entity.projectile;
 
-import net.michael.nocturne.item.ModItems;
+import net.michael.nocturne.tag.ModTags;
 import net.michael.nocturne.world.entity.ModEntities;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -13,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
@@ -51,11 +54,16 @@ public class WhipEntity extends Projectile {
 
     // Position where this whip tip started, used to measure its travel distance.
     private Vec3 spawnPosition = Vec3.ZERO;
-    private static final int SWEEP_HIT_COOLDOWN = 10;
+    private static final int SWEEP_HIT_COOLDOWN = 20;
     private final Map<UUID, Long> lastSweepHitTick = new HashMap<>();
+
+    @Nullable
+    private Vec3 previousSweepLookAngle;
+    private long previousSweepTick;
 
     public float sweepDamage = 4F;
     public float lashDamage = 8F;
+
 
     public double getSweepDamage() {
         return this.sweepDamage;
@@ -201,8 +209,8 @@ public class WhipEntity extends Projectile {
     public boolean mustRetractWhip(Player player) { // Discard the tip if its owner is invalid or no longer holds a whip.
         ItemStack itemStack = player.getMainHandItem(); // Get the main-hand item.
         ItemStack itemStack2 = player.getOffhandItem(); // Get the off-hand item.
-        boolean bl = itemStack.is(ModItems.WHIP.get()); // Check whether the main hand holds the whip.
-        boolean bl2 = itemStack2.is(ModItems.WHIP.get()); // Check whether the whip is in the offhand.
+        boolean bl = itemStack.is(ModTags.Items.WHIPS); // Check whether the main hand holds the whip.
+        boolean bl2 = itemStack2.is(ModTags.Items.WHIPS); // Check whether the whip is in the offhand.
         // Retracting tips may be farther away than the extension limit.
         // This method only checks whether the owner is valid and still holding
         // the whip. The distance limit is checked in tick(), where reaching it
@@ -213,6 +221,30 @@ public class WhipEntity extends Projectile {
         this.discardWhip(); // Remove the tip when the owner is invalid or has put the whip away.
         return true;
 
+    }
+    public void updateVelocity(Entity entity) {
+
+        Vec3 vec3 = this.getDeltaMovement();
+        boolean flag = this.isNoGravity();
+
+        //calculate projectile position
+        double X = this.getX();
+        double Y = this.getY();
+        double Z = this.getZ();
+
+        // Air drag
+        float drag = 0.99F;
+
+        //water drag
+        if (this.isInWater()){
+            drag = 0.55F;
+        }
+
+        // Apply drag
+        this.setDeltaMovement(vec3.scale((double) drag));
+
+        //Apply gravity
+        if (!isNoGravity()) {}
     }
 
     @Override
@@ -225,7 +257,6 @@ public class WhipEntity extends Projectile {
             this.discardWhip();
             return;
         }
-
         // Collision callbacks can change state or damage entities, so run them
         // only on the authoritative side and only while the tip is outbound.
         if (!this.level().isClientSide && getCurrentState() == WhipEntityState.EXTENDING && !sweepHeld) {
@@ -274,23 +305,36 @@ public class WhipEntity extends Projectile {
     private void updateSweep(Player player) {
         Vec3 previousPosition = position();
         Vec3 targetPosition = player.getEyePosition().add(player.getLookAngle().scale(MAX_REACH));
-        Vec3 movement = targetPosition.subtract(previousPosition);
         moveTo(targetPosition.x, targetPosition.y, targetPosition.z);
         setDeltaMovement(Vec3.ZERO); // Aim tracking is positional; displacement must not become projectile velocity.
-
         long now = level().getGameTime();
+        Vec3 currentLookAngle = player.getLookAngle();
+        double angularVelocity = 0.0;
+        if (previousSweepLookAngle != null) {
+            long elapsedTicks = now - previousSweepTick;
+            if (elapsedTicks > 0) {
+                double dot = Mth.clamp(previousSweepLookAngle.dot(currentLookAngle), -1.0, 1.0);
+                angularVelocity = Math.acos(dot) / elapsedTicks;
+            }
+        }
+        previousSweepLookAngle = currentLookAngle;
+        previousSweepTick = now;
+
+
         var searchBox = new net.minecraft.world.phys.AABB(previousPosition, targetPosition).inflate(1.0);
         for (LivingEntity target : level().getEntitiesOfClass(LivingEntity.class, searchBox,
                 entity -> canHitEntity(entity))) {
             boolean onPath = target.getBoundingBox().inflate(0.3).clip(previousPosition, targetPosition).isPresent();
             boolean atTip = target.getBoundingBox().intersects(getBoundingBox());
-            if (!onPath && !atTip) continue;
+                   if (!onPath && !atTip) continue;
             Long lastHit = lastSweepHitTick.get(target.getUUID());
             if (lastHit != null && now - lastHit < SWEEP_HIT_COOLDOWN) continue;
-            Player owner = getPlayerOwner();
-            if (owner != null && target.hurt(damageSources().playerAttack(owner), sweepDamage)) {
+            Mth.clamp(sweepDamage, sweepDamage, 40F);
+            float damage = (float) (sweepDamage + (angularVelocity * 20));
+            if (target.hurt(damageSources().playerAttack(player), damage)) {
+                player.sendSystemMessage(Component.literal("Damage Amount: " + damage));
                 lastSweepHitTick.put(target.getUUID(), now);
-                damageWhip(owner);
+                damageWhip(player);
             }
         }
     }
@@ -354,11 +398,11 @@ public class WhipEntity extends Projectile {
     private void damageWhip(Player player) {
         ItemStack stack = player.getMainHandItem();
         InteractionHand hand = InteractionHand.MAIN_HAND;
-        if (!stack.is(ModItems.WHIP.get())) {
+        if (!stack.is(ModTags.Items.WHIPS)) {
             stack = player.getOffhandItem();
             hand = InteractionHand.OFF_HAND;
         }
-        if (stack.is(ModItems.WHIP.get())) {
+        if (stack.is(ModTags.Items.WHIPS)) {
             InteractionHand breakHand = hand;
             stack.hurtAndBreak(1, player, brokenPlayer -> brokenPlayer.broadcastBreakEvent(breakHand));
         }
@@ -379,6 +423,8 @@ public class WhipEntity extends Projectile {
         sweepHeld = false; // Stop the held sweep behaviour after a release request.
         setCurrentState(WhipEntityState.RETRACTING); // Tell the server-side entity to return to its owner.
     }
+
+
 
     public enum WhipEntityState { // The three movement states used by the whip tip.
         // The tip is travelling away from the player.

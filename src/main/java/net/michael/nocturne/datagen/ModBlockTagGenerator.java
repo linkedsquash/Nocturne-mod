@@ -29,20 +29,29 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.MAGIC_BLOCK.get()
                         ,ModBlocks.BLOODSTONE_BLOCK.get()
                         ,ModBlocks.BLOODSTONE_ORE.get()
-                        ,ModBlocks.TIN_ORE.get());
+                        ,ModBlocks.TIN_ORE.get()
+                        ,ModBlocks.TIN_BLOCK.get()
+                        ,ModBlocks.BRONZE_BLOCK.get());
 
         this.tag(BlockTags.NEEDS_STONE_TOOL);
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(ModBlocks.MAGIC_BLOCK.get())
                 .add(ModBlocks.BLOODSTONE_ORE.get())
-                .add(ModBlocks.TIN_ORE.get());
+                .add(ModBlocks.TIN_ORE.get())
+                .add(ModBlocks.TIN_BLOCK.get())
+                .add(ModBlocks.BRONZE_BLOCK.get());
 
         this.tag(BlockTags.NEEDS_DIAMOND_TOOL);
 
         this.tag(Tags.Blocks.NEEDS_NETHERITE_TOOL);
 
-
+        this.tag(BlockTags.FENCES)
+                .add(ModBlocks.BLOODSTONE_FENCE.get());
+        this.tag(BlockTags.FENCE_GATES)
+                .add(ModBlocks.BLOODSTONE_FENCE.get());
+        this.tag(BlockTags.WALLS)
+                .add(ModBlocks.BLOODSTONE_WALL.get());
 
     }
 }

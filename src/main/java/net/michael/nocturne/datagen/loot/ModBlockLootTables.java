@@ -18,6 +18,21 @@ public class ModBlockLootTables extends BlockLootSubProvider {
     protected void generate() {
         this.dropSelf(ModBlocks.MAGIC_BLOCK.get());
         this.dropSelf(ModBlocks.BLOODSTONE_BLOCK.get());
+        this.dropSelf(ModBlocks.TIN_BLOCK.get());
+        this.dropSelf(ModBlocks.BRONZE_BLOCK.get());
+
+        this.dropSelf(ModBlocks.BLOODSTONE_STAIRS.get());
+        this.dropSelf(ModBlocks.BLOODSTONE_BUTTON.get());
+        this.dropSelf(ModBlocks.BLOODSTONE_FENCE_GATE.get());
+        this.dropSelf(ModBlocks.BLOODSTONE_FENCE.get());
+        this.dropSelf(ModBlocks.BLOODSTONE_WALL.get());
+        this.dropSelf(ModBlocks.BLOODSTONE_TRAPDOOR.get());
+        this.dropSelf(ModBlocks.BLOODSTONE_PRESSURE_PLATE.get());
+
+        this.add(ModBlocks.BLOODSTONE_SLAB.get(),
+        block -> createSlabItemTable(ModBlocks.BLOODSTONE_SLAB.get()));
+        this.add(ModBlocks.BLOODSTONE_DOOR.get(),
+                block -> createSlabItemTable(ModBlocks.BLOODSTONE_DOOR.get()));
 
         this.add(ModBlocks.BLOODSTONE_ORE.get(),
               block -> createOreDrop(ModBlocks.BLOODSTONE_ORE.get(), ModItems.BLOODSTONE.get()));

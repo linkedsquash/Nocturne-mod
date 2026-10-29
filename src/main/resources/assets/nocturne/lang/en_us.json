@@ -4,14 +4,28 @@
   "item.nocturne.bloodstone":"Bloodstone",
   "item.nocturne.explosive_stone": "Explosive stone",
   "item.nocturne.tin_ingot": "Tin ingot",
-  "item.nocturne.tin_raw": "Tin raw",
+  "item.nocturne.raw_tin": "Raw Tin",
   "item.nocturne.bronze_ingot": "Bronze ingot",
+  "item.nocturne.belmont_whip":"Belmont Whip",
 
 
   "block.nocturne.magic_block":"Magic block",
   "block.nocturne.bloodstone_block":"Bloodstone block",
   "block.nocturne.bloodstone_ore": "Bloodstone ore",
   "block.nocturne.tin_ore": "Tin ore",
+  "block.nocturne.tin_block": "Tin Block",
+  "block.nocturne.bronze_block": "Bronze Block",
+
+  "block.nocturne.bloodstone_stairs": "Bloodstone Stairs",
+  "block.nocturne.bloodstone_slab": "Bloodstone Slab",
+  "block.nocturne.bloodstone_fence": "Bloodstone Fence",
+  "block.nocturne.bloodstone_fence_gate": "Bloodstone Fence gate",
+  "block.nocturne.bloodstone_wall": "Bloodstone Wall",
+  "block.nocturne.bloodstone_door": "Bloodstone Door",
+  "block.nocturne.bloodstone_pressure_plate": "Bloodstone Pressure Plate",
+  "block.nocturne.bloodstone_button": "Bloodstone Button",
+  "block.nocturne.bloodstone_trapdoor": "Bloodstone Trapdoor",
+
 
 
   "creativetab.nocturne_tab":"Nocturne",

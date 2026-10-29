@@ -4,6 +4,7 @@ import net.michael.nocturne.Nocturne;
 import net.michael.nocturne.item.ModItems;
 import net.michael.nocturne.network.ModPacketHandler;
 import net.michael.nocturne.network.packets.SweepAttackPacket;
+import net.michael.nocturne.tag.ModTags;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -32,8 +33,8 @@ public class ClientInputEvents {
         }
 
         boolean holdingWhip =
-                minecraft.player.getMainHandItem().is(ModItems.WHIP.get())
-                        || minecraft.player.getOffhandItem().is(ModItems.WHIP.get());
+                minecraft.player.getMainHandItem().is(ModTags.Items.WHIPS)
+                        || minecraft.player.getOffhandItem().is(ModTags.Items.WHIPS);
 
         boolean shouldSweep =
                 minecraft.screen == null

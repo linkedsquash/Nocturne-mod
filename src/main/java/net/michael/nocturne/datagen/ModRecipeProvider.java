@@ -40,9 +40,40 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("ccc")
                 .pattern("cct")
                 .pattern("ttt")
-                .define('C', Tags.Items.INGOTS_COPPER)
-                .define('T', ModItems.TIN_INGOT.get())
+                .define('c', Tags.Items.INGOTS_COPPER)
+                .define('t', ModItems.TIN_INGOT.get())
                 .unlockedBy(getHasName(ModItems.TIN_INGOT.get()), has(ModItems.TIN_INGOT.get()))
+                .save(pWriter, "nocturne:bronze_ingot_from_copper_tin");
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.BRONZE_INGOT.get(), 9)
+                .requires(ModBlocks.BRONZE_BLOCK.get())
+                .unlockedBy(getHasName(ModBlocks.BRONZE_BLOCK.get()), has(ModBlocks.BRONZE_BLOCK.get()))
+                .save(pWriter, "nocturne:bronze_ingot_from_bronze_block");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BRONZE_BLOCK.get())
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', ModItems.BRONZE_INGOT.get())
+                .unlockedBy(getHasName(ModItems.BRONZE_INGOT.get()), has(ModItems.BRONZE_INGOT.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.BRONZE_INGOT.get(), 9)
+                .requires(ModBlocks.BRONZE_BLOCK.get())
+                .unlockedBy(getHasName(ModBlocks.BRONZE_BLOCK.get()), has(ModBlocks.BRONZE_BLOCK.get()))
+                .save(pWriter);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.TIN_BLOCK.get())
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', ModItems.TIN_INGOT.get())
+                .unlockedBy(getHasName(ModItems.TIN_INGOT.get()), has(ModItems.TIN_INGOT.get()))
+                .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.TIN_INGOT.get(), 9)
+                .requires(ModBlocks.TIN_BLOCK.get())
+                .unlockedBy(getHasName(ModBlocks.TIN_BLOCK.get()), has(ModBlocks.TIN_BLOCK.get()))
                 .save(pWriter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BLOODSTONE_BLOCK.get())
@@ -53,10 +84,13 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy(getHasName(ModItems.BLOODSTONE.get()), has(ModItems.BLOODSTONE.get()))
                 .save(pWriter);
 
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.BLOODSTONE.get(), 9)
                 .requires(ModBlocks.BLOODSTONE_BLOCK.get())
                 .unlockedBy(getHasName(ModBlocks.BLOODSTONE_BLOCK.get()), has(ModBlocks.BLOODSTONE_BLOCK.get()))
                 .save(pWriter);
+
+
     }
 
     protected static void oreSmelting(Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTIme, String pGroup) {

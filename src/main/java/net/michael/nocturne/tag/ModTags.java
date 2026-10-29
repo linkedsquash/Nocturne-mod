@@ -7,8 +7,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-
-import javax.swing.text.html.HTML;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModTags {
 
@@ -22,10 +22,12 @@ public class ModTags {
     }
     public static class Items {
 
+        public static final TagKey<Item> WHIPS = tag("whips");
+        };
+
         public static final TagKey<Item> TIN = tag("tin");
 
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(Nocturne.MOD_ID, name));
         };
     }
-}

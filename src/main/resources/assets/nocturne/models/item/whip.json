@@ -1,6 +1,20 @@
 {
-    "parent": "item/generated",
-    "textures": {
-      "layer0": "nocturne:item/whip"
+  "parent": "minecraft:item/handheld",
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "nocturne:item/whip_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "nocturne:item/whip_2d"
+    },
+    "ground": {
+      "parent": "nocturne:item/whip_2d"
+    },
+    "fixed": {
+      "parent": "nocturne:item/whip_2d"
     }
+  }
 }
+
+

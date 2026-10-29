@@ -25,17 +25,29 @@ public class ModCreativeModeTabs {
                     // Add the mod's items and blocks to the tab when Minecraft fills it.
                     .displayItems((pParameter, pOutput) -> {
                         pOutput.accept(ModItems.WHIP.get());
-                        pOutput.accept(ModItems.BLOODSTONE.get());
+                        pOutput.accept(ModItems.BELMONT_WHIP.get());
                         pOutput.accept(ModItems.BLOOD_PEACH.get());
                         pOutput.accept(ModItems.EXPLOSIVE_STONE.get());
                         pOutput.accept(ModItems.BRONZE_INGOT.get());
+                        pOutput.accept(ModBlocks.BRONZE_BLOCK.get());
+                        pOutput.accept(ModBlocks.TIN_BLOCK.get());
                         pOutput.accept(ModItems.TIN_INGOT.get());
                         pOutput.accept(ModItems.RAW_TIN.get());
-
                         pOutput.accept(ModBlocks.TIN_ORE.get());
+                        pOutput.accept(ModBlocks.MAGIC_BLOCK.get());
+
+                        pOutput.accept(ModItems.BLOODSTONE.get());
                         pOutput.accept(ModBlocks.BLOODSTONE_BLOCK.get());
                         pOutput.accept(ModBlocks.BLOODSTONE_ORE.get());
-                        pOutput.accept(ModBlocks.MAGIC_BLOCK.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_STAIRS.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_SLAB.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_DOOR.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_TRAPDOOR.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_FENCE.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_FENCE_GATE.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_WALL.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_PRESSURE_PLATE.get());
+                        pOutput.accept(ModBlocks.BLOODSTONE_BUTTON.get());
                     })
                     .build());
 

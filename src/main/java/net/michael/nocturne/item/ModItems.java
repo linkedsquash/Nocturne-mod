@@ -14,6 +14,8 @@ public class   ModItems {
     // Hold this mod's item registrations until Forge processes them during startup.
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Nocturne.MOD_ID);
 
+    public static final RegistryObject<Item> BELMONT_WHIP = ITEMS.register("belmont_whip", () -> new WhipItem(new Item.Properties().durability(1000)));
+
     public static final RegistryObject<Item>  WHIP = ITEMS.register("whip", () -> new WhipItem(new Item.Properties().durability(200)));
 
     public static final RegistryObject<Item> BLOODSTONE = ITEMS.register("bloodstone", () -> new Item(new Item.Properties()));

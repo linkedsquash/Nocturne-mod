@@ -1,9 +1,10 @@
 package net.michael.nocturne.network.packets;
 
-import net.michael.nocturne.item.ModItems;
+import net.michael.nocturne.tag.ModTags;
 import net.michael.nocturne.world.entity.projectile.WhipEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -43,19 +44,19 @@ public record SweepAttackPacket(Behavior behavior) {
                 return;
             }
 
-            Item whipItem = ModItems.WHIP.get(); // Resolve the registered whip item on the server.
             ItemStack mainHand = player.getMainHandItem(); // Read the server's main-hand stack.
             ItemStack offHand = player.getOffhandItem(); // Read the server's off-hand stack.
-            if (!mainHand.is(whipItem) && !offHand.is(whipItem)) { // Do not trust the client's held-item claim.
+            if (!mainHand.is(ModTags.Items.WHIPS) && !offHand.is(ModTags.Items.WHIPS)) { // Do not trust the client's held-item claim.
                 return;
             }
 
-            if (active == null) { // Ignore repeated start requests while a whip is already active.
+            if (active == null) {
                 Level level = player.level(); // Use the player's server world.
                 WhipEntity whip = new WhipEntity(player, level); // Create the whip owned by this player.
                 level.addFreshEntity(whip); // Add it to the server world so it synchronises to clients.
-                whip.startSweep(); // Start the requested sweep behaviour.
+                active = whip;
             }
+            active.startSweep(); // Start or switch the active whip to sweep behaviour.
         });
         context.setPacketHandled(true); // Mark the packet handled regardless of the requested action.
     }
